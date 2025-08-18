@@ -1,0 +1,38 @@
+package postgres
+
+import (
+	"database/sql"
+	"fmt"
+	"log"
+
+	_ "github.com/lib/pq" // PostgreSQL driver
+)
+
+// PostgresDB represents the PostgreSQL database connection
+type PostgresDB struct {
+	Conn *sql.DB
+}
+
+// NewPostgresDB initializes a new PostgreSQL database connection
+func NewPostgresDB(host, port, user, password, dbname string) (*PostgresDB, error) {
+	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
+
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	if err = db.Ping(); err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	return &PostgresDB{Conn: db}, nil
+}
+
+// Close closes the database connection
+func (db *PostgresDB) Close() {
+	db.Conn.Close()
+}
