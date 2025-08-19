@@ -1,23 +1,19 @@
 package main
 
 import (
-    "log"
-    "net/http"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-    // Set up the HTTP server
-    http.HandleFunc("/health", healthCheckHandler)
+	router := gin.Default()
 
-    // Start the server
-    log.Println("Starting server on :8080")
-    if err := http.ListenAndServe(":8080", nil); err != nil {
-        log.Fatalf("Could not start server: %s\n", err)
-    }
-}
+	router.GET("/ping", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "pong",
+		})
+	})
 
-// healthCheckHandler responds with a simple health check message
-func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
-    w.WriteHeader(http.StatusOK)
-    w.Write([]byte("OK"))
+	router.Run()
 }
