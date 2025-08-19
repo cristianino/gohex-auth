@@ -1,0 +1,14 @@
+package routes
+
+import (
+    "github.com/gin-gonic/gin"
+)
+
+// SetupRoutes initializes the routes for the HTTP API
+func SetupRoutes(router *gin.Engine) {
+    // Define your routes here
+    // Example:
+    // router.POST("/api/v1/auth/register", handlers.RegisterHandler)
+    // router.POST("/api/v1/auth/login", handlers.LoginHandler)
+    // router.GET("/api/v1/users/profile", middleware.AuthMiddleware(), handlers.ProfileHandler)
+}
