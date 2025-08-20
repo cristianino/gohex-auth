@@ -1,73 +1,140 @@
-Your task is to "onboard" this repository to Copilot coding agent by adding a .github/copilot-instructions.md file in the repository that contains information describing how a coding agent seeing it for the first time can work most efficiently.
+# GoHex-Auth Repository Instructions for Copilot
 
-You will do this task only one time per repository and doing a good job can SIGNIFICANTLY improve the quality of the agent's work, so take your time, think carefully, and search thoroughly before writing the instructions.
+## Repository Overview
 
-<Goals>
-- Reduce the likelihood of a coding agent pull request getting rejected by the user due to
-generating code that fails the continuous integration build, fails a validation pipeline, or
-having misbehavior.
-- Minimize bash command and build failures.
-- Allow the agent to complete its task more quickly by minimizing the need for exploration using grep, find, str_replace_editor, and code search tools.
-</Goals>
+**What this repository does:** This is a Go REST API template implementing Hexagonal Architecture (Ports & Adapters) with JWT authentication, PostgreSQL database integration, and Redis caching. It's designed as a production-ready microservice template.
 
-<Limitations>
-- Instructions must be no longer than 2 pages.
-- Instructions must not be task specific.
-</Limitations>
+**Technical specifications:**
+- **Language:** Go 1.23
+- **Framework:** Gin HTTP web framework
+- **Architecture:** Hexagonal (Ports & Adapters)
+- **Database:** PostgreSQL 15+ with migrations
+- **Caching:** Redis 7+
+- **Containerization:** Docker & Docker Compose
+- **Project size:** Small-medium (~50 files, organized in hexagonal architecture)
 
-<WhatToAdd>
+## Build, Test, and Validation Instructions
 
-Add the following high level details about the codebase to reduce the amount of searching the agent has to do to understand the codebase each time:
-<HighLevelDetails>
+### Prerequisites
+Always ensure you have Go 1.23+ installed before working with this repository.
 
-- A summary of what the repository does.
-- High level repository information, such as the size of the repo, the type of the project, the languages, frameworks, or target runtimes in use.
-</HighLevelDetails>
+### Essential Commands (tested and verified working)
 
-Add information about how to build and validate changes so the agent does not need to search and find it each time.
-<BuildInstructions>
+**Install dependencies (always run first):**
+```bash
+go mod download
+go mod verify
+```
 
-- For each of bootstrap, build, test, run, lint, and any other scripted step, document the sequence of steps to take to run it successfully as well as the versions of any runtime or build tools used.
-- Each command should be validated by running it to ensure that it works correctly as well as any preconditions and postconditions.
-- Try cleaning the repo and environment and running commands in different orders and document errors and and misbehavior observed as well as any steps used to mitigate the problem.
-- Run the tests and document the order of steps required to run the tests.
-- Make a change to the codebase. Document any unexpected build issues as well as the workarounds.
-- Document environment setup steps that seem optional but that you have validated are actually required.
-- Document the time required for commands that failed due to timing out.
-- When you find a sequence of commands that work for a particular purpose, document them in detail.
-- Use language to indicate when something should always be done. For example: "always run npm install before building".
-- Record any validation steps from documentation.
-</BuildInstructions>
+**Build the project:**
+```bash
+go build -v ./...
+```
 
-List key facts about the layout and architecture of the codebase to help the agent find where to make changes with minimal searching.
-<ProjectLayout>
+**Run all validation tools (in this order):**
+```bash
+go vet ./...                    # Go static analysis
+staticcheck ./...              # Advanced static analysis (requires: go install honnef.co/go/tools/cmd/staticcheck@latest)
+golangci-lint run              # Comprehensive linting (see .golangci.yml config)
+```
 
-- A description of the major architectural elements of the project, including the relative paths to the main project files, the location
-of configuration files for linting, compilation, testing, and preferences.
-- A description of the checks run prior to check in, including any GitHub workflows, continuous integration builds, or other validation pipelines.
-- Document the steps so that the agent can replicate these itself.
-- Any explicit validation steps that the agent can consider to have further confidence in its changes.
-- Dependencies that aren't obvious from the layout or file structure.
-- Finally, fill in any remaining space with detailed lists of the following, in order of priority: the list of files in the repo root, the
-contents of the README, the contents of any key source files, the list of files in the next level down of directories, giving priority to the more structurally important and snippets of code from key source files, such as the one containing the main method.
-</ProjectLayout>
-</WhatToAdd>
+**Run tests (validated working):**
+```bash
+# Unit tests
+go test ./tests/unit/... -v -race -coverprofile=unit.out
 
-<StepsToFollow>
-- Perform a comprehensive inventory of the codebase. Search for and view:
-- README.md, CONTRIBUTING.md, and all other documentation files.
-- Search the codebase for build steps and indications of workarounds like 'HACK', 'TODO', etc.
-- All scripts, particularly those pertaining to build and repo or environment setup.
-- All build and actions pipelines.
-- All project files.
-- All configuration and linting files.
-- For each file:
-- think: are the contents or the existence of the file information that the coding agent will need to implement, build, test, validate, or demo a code change?
-- If yes:
-   - Document the command or information in detail.
-   - Explicitly indicate which commands work and which do not and the order in which commands should be run.
-   - Document any errors encountered as well as the steps taken to workaround them.
-- Document any other steps or information that the agent can use to reduce time spent exploring or trying and failing to run bash commands.
-- Finally, explicitly instruct the agent to trust the instructions and only perform a search if the information in the instructions is incomplete or found to be in error.
-</StepsToFollow>
-   - Document any errors encountered as well as the steps taken to work-around them.
+# Integration tests  
+go test ./tests/integration/... -v -race -coverprofile=integration.out
+
+# E2E tests (will skip in CI environments)
+go test ./tests/e2e/... -v -race -coverprofile=e2e.out
+```
+
+**Generate coverage report:**
+```bash
+go install github.com/wadey/gocovmerge@latest
+gocovmerge unit.out integration.out e2e.out > coverage.out
+```
+
+**Cross-platform builds (for releases):**
+```bash
+mkdir -p bin/
+GOOS=linux GOARCH=amd64 go build -o bin/gohex-auth-linux-amd64 ./cmd/api
+GOOS=darwin GOARCH=amd64 go build -o bin/gohex-auth-darwin-amd64 ./cmd/api
+GOOS=windows GOARCH=amd64 go build -o bin/gohex-auth-windows-amd64.exe ./cmd/api
+```
+
+**Run with Docker (verified working):**
+```bash
+docker-compose up -d          # Start all services
+docker-compose logs -f api    # View logs
+docker-compose down           # Stop all services
+```
+
+### Important Notes
+- **Always run `go mod download && go mod verify` before building**
+- E2E tests expect a running server and will skip in CI (expected behavior)
+- The Dockerfile uses Go 1.23 - do not change this without updating go.mod
+- Build artifacts (bin/, *.out files) are automatically ignored by .gitignore
+
+## Project Architecture and Layout
+
+### Directory Structure
+```
+cmd/api/main.go                 # Application entry point
+internal/                       # Private application code (Go compiler enforced)
+  ├── core/                     # Business logic (domain layer)
+  ├── adapters/                 # External integrations
+  │   ├── input/http/           # HTTP handlers, middleware, routes
+  │   └── output/persistence/   # Database implementations
+  └── config/                   # Configuration management
+pkg/                           # Public packages for external use
+tests/                         # Test suites
+  ├── unit/                    # Unit tests
+  ├── integration/             # Integration tests
+  └── e2e/                     # End-to-end tests
+docker/                        # Docker configuration files
+scripts/                       # Build and deployment scripts
+```
+
+### Key Configuration Files
+- **go.mod/go.sum:** Go 1.23 with Gin framework dependencies
+- **.golangci.yml:** Linting configuration (timeout: 5m, enabled: errcheck, govet, ineffassign, staticcheck, unused)
+- **.env.example:** Environment template (copy to .env for local development)
+- **docker-compose.yml:** Multi-service setup (API, PostgreSQL, Redis)
+- **Dockerfile:** Go 1.23 container build
+
+### GitHub Actions CI/CD Pipeline
+Located in `.github/workflows/go.yml` - runs on push/PR to develop/main:
+
+**Test job matrix:** Go 1.21, 1.22, 1.23
+**Build job:** Cross-platform builds for Linux, macOS, Windows
+**Validation steps:**
+1. Dependencies download/verify
+2. go vet
+3. staticcheck
+4. golangci-lint (v1.59.1)
+5. Build validation
+6. Test execution (unit, integration, e2e)
+7. Coverage reporting
+8. Artifact generation
+
+### Key Implementation Details
+- **Entry point:** `cmd/api/main.go` - minimal Gin setup with /ping endpoint
+- **Router setup:** `internal/app/app.go` contains SetupRouter() function
+- **Test organization:** Tests are properly isolated in their respective directories
+- **Docker setup:** Uses multi-stage build with Go 1.23 base image
+
+### Common Patterns
+- Import path: `github.com/cristianino/gohex-auth`
+- All tests use testify framework (`github.com/stretchr/testify`)
+- HTTP responses use Gin's JSON binding
+- Configuration follows 12-factor app principles
+
+### Troubleshooting
+If you encounter Go version issues, ensure consistency across:
+- go.mod (currently: go 1.23)
+- Dockerfile (currently: FROM golang:1.23) 
+- GitHub Actions workflow (currently: 1.21, 1.22, 1.23)
+
+Trust these instructions and only search the codebase if information appears incomplete or incorrect.
