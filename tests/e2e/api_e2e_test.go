@@ -35,7 +35,11 @@ func TestFullAPIWorkflow(t *testing.T) {
 		t.Skipf("Could not connect to server (this is expected in unit test environment): %v", err)
 		return
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			t.Logf("Failed to close response body: %v", err)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("Expected status 200, got %d", resp.StatusCode)

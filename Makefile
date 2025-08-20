@@ -52,12 +52,12 @@ test-coverage: ## Run tests with coverage
 # Code quality targets
 lint: ## Run golangci-lint
 	@echo "Running golangci-lint..."
-	@golangci-lint run
+	@$(shell go env GOPATH)/bin/golangci-lint run
 
 fmt: ## Format code
 	@echo "Formatting code..."
 	@go fmt ./...
-	@gofumpt -w .
+	@$(shell go env GOPATH)/bin/gofumpt -w .
 
 vet: ## Run go vet
 	@echo "Running go vet..."
@@ -65,7 +65,7 @@ vet: ## Run go vet
 
 staticcheck: ## Run staticcheck
 	@echo "Running staticcheck..."
-	@staticcheck ./...
+	@$(shell go env GOPATH)/bin/staticcheck ./...
 
 # Development targets
 deps: ## Download dependencies
@@ -85,7 +85,7 @@ run: ## Run the application
 
 dev-run: ## Run with live reload (requires air)
 	@echo "Starting application with live reload..."
-	@air
+	@$(shell go env GOPATH)/bin/air
 
 # Docker targets
 docker-build: ## Build Docker image

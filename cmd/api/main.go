@@ -7,5 +7,7 @@ import (
 func main() {
 	router := app.SetupRouter()
 
-	router.Run()
+	if err := router.Run(); err != nil {
+		panic(err)
+	}
 }
