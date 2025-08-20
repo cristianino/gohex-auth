@@ -1,59 +1,59 @@
 # Tests
 
-Este directorio contiene todas las pruebas organizadas según la arquitectura hexagonal y tipos de testing.
+This directory contains all tests organized according to hexagonal architecture and testing types.
 
-## Estructura
+## Structure
 
 ```
 tests/
-├── unit/          # Tests unitarios - prueban componentes individuales
-├── integration/   # Tests de integración - prueban la interacción entre componentes
-├── e2e/          # Tests end-to-end - prueban el flujo completo de la aplicación
-└── README.md     # Este archivo
+├── unit/          # Unit tests - test individual components in isolation
+├── integration/   # Integration tests - test component interactions
+├── e2e/          # End-to-end tests - test complete application flows
+└── README.md     # This file
 ```
 
-## Tipos de Tests
+## Test Types
 
-### Tests Unitarios (`unit/`)
-- Prueban funciones y métodos individuales de forma aislada
-- Uso de mocks para dependencias externas
-- Ejecución rápida
-- Ejemplo: `app_test.go` - prueba la creación del router
+### Unit Tests (`unit/`)
+- Test individual functions and methods in isolation
+- Use mocks for external dependencies
+- Fast execution
+- Example: `app_test.go` - tests router creation and configuration
 
-### Tests de Integración (`integration/`)
-- Prueban la interacción entre múltiples componentes
-- Pueden usar bases de datos en memoria o servicios mockeados
-- Ejemplo: `api_test.go` - prueba endpoints HTTP usando httptest
+### Integration Tests (`integration/`)
+- Test interactions between multiple components
+- May use in-memory databases or mocked services
+- Example: `api_test.go` - tests HTTP endpoints using httptest
 
-### Tests End-to-End (`e2e/`)
-- Prueban el flujo completo de la aplicación
-- Pueden requerir servicios externos reales
-- Más lentos pero más cercanos al uso real
-- Ejemplo: `api_e2e_test.go` - prueba con servidor HTTP real
+### End-to-End Tests (`e2e/`)
+- Test complete application workflows
+- May require real external services
+- Slower but closer to real usage
+- Example: `api_e2e_test.go` - tests with real HTTP server
 
-## Comandos
+## Commands
 
 ```bash
-# Ejecutar todos los tests
+# Run all tests
 go test ./tests/... -v
 
-# Ejecutar solo tests unitarios
+# Run only unit tests
 go test ./tests/unit -v
 
-# Ejecutar solo tests de integración
+# Run only integration tests
 go test ./tests/integration -v
 
-# Ejecutar solo tests e2e
+# Run only e2e tests
 go test ./tests/e2e -v
 
-# Ejecutar tests con coverage
+# Run tests with coverage
 go test ./tests/... -v -cover
 ```
 
-## Convenciones
+## Conventions
 
-- Cada archivo de test debe terminar en `_test.go`
-- Los tests deben seguir el patrón `TestNombreFuncion`
-- Usar `gin.SetMode(gin.TestMode)` en tests con Gin
-- Los tests de integración deben usar `httptest` para evitar levantar servidores reales
-- Los tests e2e pueden usar servidores reales pero deben hacer cleanup
+- Each test file must end with `_test.go`
+- Tests must follow the pattern `TestFunctionName`
+- Use `gin.SetMode(gin.TestMode)` in tests with Gin
+- Integration tests should use `httptest` to avoid starting real servers
+- E2E tests may use real servers but must cleanup properly
