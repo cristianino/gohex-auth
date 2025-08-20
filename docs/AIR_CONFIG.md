@@ -51,6 +51,7 @@ docker-compose up api-dev
 - **Polling**: Docker volume mounts don't always trigger native file system events
 - **Longer delays**: Container I/O is slower than native file system
 - **Clear screen**: Better experience in container logs
+- **VCS disabled**: `-buildvcs=false` prevents Git-related build errors in containers
 
 ### Local Optimization  
 - **Native events**: Faster and more efficient than polling
