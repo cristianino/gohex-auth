@@ -112,11 +112,37 @@ make dev-run
 ### Docker Commands
 
 ```bash
-# Build Docker image
-make docker-build
+# Build images
+make docker-build         # Production image  
+make docker-build-dev      # Development image with Air
 
-# Run Docker container
-make docker-run
+# Run containers
+make docker-run           # Production container
+make docker-dev           # Development with live reload
+make docker-dev-build     # Build and run development
+
+# Docker Compose operations  
+make docker-logs          # View development logs
+make docker-stop          # Stop all services
+```
+
+### Docker Live Reload Development
+
+The development Docker setup includes Air for live reload:
+
+- **Configuration**: `.air.docker.toml` - Optimized for Docker containers
+- **Features**: Automatic rebuilds, file watching, Docker-specific settings
+- **Port**: Application runs on `localhost:8080`
+- **Volume mapping**: Code changes are automatically detected
+
+**Usage:**
+```bash
+# Start with live reload
+make docker-dev
+
+# Make code changes - they'll be automatically rebuilt!
+# View logs in real-time
+make docker-logs
 ```
 
 ### Cleanup Commands

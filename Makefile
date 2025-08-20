@@ -92,9 +92,29 @@ docker-build: ## Build Docker image
 	@echo "Building Docker image..."
 	@docker build -t gohex-auth .
 
+docker-build-dev: ## Build Docker development image
+	@echo "Building Docker development image..."
+	@docker build -f Dockerfile.dev -t gohex-auth:dev .
+
 docker-run: ## Run Docker container
 	@echo "Running Docker container..."
 	@docker run -p 8080:8080 gohex-auth
+
+docker-dev: ## Run development environment with Docker Compose
+	@echo "Starting development environment with live reload..."
+	@docker-compose up api-dev
+
+docker-dev-build: ## Build and run development environment
+	@echo "Building and starting development environment..."
+	@docker-compose up --build api-dev
+
+docker-stop: ## Stop all Docker services
+	@echo "Stopping Docker services..."
+	@docker-compose down
+
+docker-logs: ## Show logs from development container
+	@echo "Showing development container logs..."
+	@docker-compose logs -f api-dev
 
 # Cleanup targets
 clean: ## Clean build artifacts

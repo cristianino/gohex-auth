@@ -16,6 +16,9 @@
 *.dylib
 main
 
+# Air live reload logs
+build-errors.log
+
 # Coverage reports
 coverage-*.html
 *.coverprofile

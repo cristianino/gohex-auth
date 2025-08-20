@@ -38,14 +38,19 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - JWT_SECRET=your-super-secret-key-here
+      - GIN_MODE=debug
     volumes:
       - .:/usr/src/app
+      - /usr/src/app/tmp  # Anonymous volume for air build artifacts
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/ping"]
-      interval: 1m30s
-      timeout: 30s
-      retries: 5
-      start_period: 30s
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      - db
+      - redis
 
   db:
     image: postgres:15

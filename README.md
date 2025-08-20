@@ -140,24 +140,40 @@ curl http://localhost:8080/ping
 
 ## Docker Usage
 
-### Run with Docker Compose
+### Development with Live Reload
 
 ```bash
-# Start services in the background
-docker-compose up -d
+# Start development environment with live reload
+make docker-dev
 
-# Follow API logs
-docker-compose logs -f api
+# Or build and start (if you made changes to Dockerfile.dev)
+make docker-dev-build
 
-# Stop and remove containers
-docker-compose down
+# View logs
+make docker-logs
+
+# Stop services
+make docker-stop
 ```
 
-### Build Docker Image
+### Production Build
 
 ```bash
 make docker-build
 make docker-run
+```
+
+### Docker Compose Services
+
+```bash
+# Start all services (API, PostgreSQL, Redis)
+docker-compose up
+
+# Start only development API with live reload
+docker-compose up api-dev
+
+# Start in background
+docker-compose up -d api-dev
 ```
 
 ## Testing
