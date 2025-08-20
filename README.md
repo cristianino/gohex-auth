@@ -2,14 +2,30 @@
 
 This repository contains the scaffolding for a Go REST API organized using Hexagonal Architecture (Ports & Adapters). The project is prepared to support JWT authentication, PostgreSQL, Redis, and migrations, but the current `cmd/api/main.go` in this branch is a minimal implementation that starts an HTTP server with Gin and exposes a simple health endpoint.
 
-Quick summary of the current state
+## Quick Start
+
+```bash
+# Install dependencies and tools
+make deps
+
+# Run development checks
+make ci
+
+# Start the application
+make run
+
+# Or start with live reload
+make dev-run
+```
+
+## Current State
 
 - The application entrypoint is `cmd/api/main.go`.
 - At the moment the server exposes only a health endpoint:
   - GET /ping -> { "message": "pong" }
 - Features referenced elsewhere in the repository (migrations, JWT, protected endpoints, Swagger docs, etc.) are not wired up by the `main.go` in this branch and should be implemented or connected before relying on them.
 
-Project structure
+## Project Structure
 
 ```
 project/
@@ -17,6 +33,7 @@ project/
 │   └── api/
 │       └── main.go               # Main application bootstrap
 ├── internal/                      # Private application code
+│   ├── app/                       # Application setup and configuration
 │   ├── core/                      # Business logic layer (Domain)
 │   │   ├── domain/                # Core business entities and logic
 │   │   │   ├── entities/          # Domain entities (User, Auth, etc.)
@@ -41,46 +58,89 @@ project/
 ├── pkg/                           # Public packages (reusable)
 │   ├── utils/
 │   └── errors/
-├── tests/                         # Test suites (unit, integration, e2e)
+├── tests/                         # Test suites organized by type
+│   ├── unit/                      # Unit tests
+│   ├── integration/               # Integration tests
+│   ├── e2e/                       # End-to-end tests
+│   └── README.md                  # Testing documentation
+├── .github/workflows/             # CI/CD pipelines
 ├── Dockerfile
 ├── Dockerfile.dev
 ├── docker-compose.yml
+├── Makefile                       # Build automation
+├── DEVELOPMENT.md                 # Development guide
 └── README.md
 ```
 
-Requirements
+## Documentation
 
-- Go 1.21+ (installed and in PATH)
+- **[Development Guide](DEVELOPMENT.md)** - Comprehensive development setup and workflow
+- **[GitHub Wiki](https://github.com/cristianino/gohex-auth/wiki)** - Detailed project documentation and architecture guides
+- **[Tools Configuration](docs/TOOLS.md)** - Development tools setup and configuration
+- **[Testing Guide](tests/README.md)** - Testing strategy and organization
+
+### Wiki Setup
+
+To set up the GitHub Wiki with comprehensive documentation:
+
+```bash
+./scripts/setup-wiki.sh
+```
+
+## Requirements
+
+- Go 1.23+ (installed and in PATH)
+- Make (build automation)
 - Docker & Docker Compose (optional — only required if you want to run Postgres/Redis via containers)
 
-Run locally (development)
+## Development
 
-1. Install module dependencies:
+For detailed development instructions, see [DEVELOPMENT.md](DEVELOPMENT.md) or browse our comprehensive [GitHub Wiki](../../wiki).
+
+### Documentation
+- **[GitHub Wiki](../../wiki)** - Comprehensive documentation and guides
+- **[Quick Start Guide](../../wiki/Quick-Start)** - Get running in 5 minutes
+- **[Development Workflow](../../wiki/Development-Workflow)** - Daily development practices
+- **[Architecture Guide](../../wiki/Hexagonal-Architecture)** - System design and patterns
+
+### Quick Development Commands
 
 ```bash
-go mod tidy
+# Show all available commands
+make help
+
+# Install dependencies and run quality checks
+make ci
+
+# Run the application
+make run
+
+# Run with live reload for development
+make dev-run
+
+# Run tests
+make test                # All tests
+make test-unit          # Unit tests only
+make test-integration   # Integration tests only
+
+# Code quality
+make fmt               # Format code
+make lint              # Run linter
+make vet               # Static analysis
 ```
 
-2. Run the application:
+## API Endpoints
 
-```bash
-go run cmd/api/main.go
-```
-
-Gin will listen on `:8080` by default, so the health endpoint will be available at:
-
-- http://localhost:8080/ping
-
-Example:
+### Health Check
 
 ```bash
 curl http://localhost:8080/ping
-# response: { "message": "pong" }
+# Response: {"message":"pong"}
 ```
 
-Run with Docker Compose (optional)
+## Docker Usage
 
-If you want to run any services defined in `docker-compose.yml` (for example Postgres or Redis), use:
+### Run with Docker Compose
 
 ```bash
 # Start services in the background
@@ -93,24 +153,55 @@ docker-compose logs -f api
 docker-compose down
 ```
 
-Testing
-
-Run all tests with:
+### Build Docker Image
 
 ```bash
-go test ./...
+make docker-build
+make docker-run
 ```
 
-Run tests with coverage:
+## Testing
+
+The project includes comprehensive testing at multiple levels:
+
+- **Unit Tests**: Test individual components in isolation
+- **Integration Tests**: Test component interactions using httptest
+- **End-to-End Tests**: Test complete workflows (may be skipped in CI environments)
 
 ```bash
-go test -v -cover ./...
+# Run all tests
+make test
+
+# Run with coverage reports
+make test-coverage
+
+# Run specific test types
+make test-unit
+make test-integration
+make test-e2e
 ```
 
-Notes and next steps
+See [tests/README.md](tests/README.md) for detailed testing documentation.
 
-- When integrating database migrations, JWT authentication, or other features, update `cmd/api/main.go` and this README with the new commands (for example `migrate`, `serve`, etc.).
-- Keep this README synchronized with changes to the main entrypoint so it accurately reflects what the service runs.
-- For local development with automatic reloads you can use `air` (install with `go install github.com/cosmtrek/air@latest`) and run `air` from the project root if you add an `air` configuration.
+## Continuous Integration
 
-If you want, I can expand the README with details about the migration tool, environment variables, Dockerfile usage, or the expected API surface once those features are implemented.
+The project uses GitHub Actions for CI/CD:
+- Runs on push/PR to `develop` and `main` branches  
+- Tests against multiple Go versions (1.23, 1.24, 1.25)
+- Performs code quality checks (vet, staticcheck, golangci-lint)
+- Generates coverage reports
+- Builds binaries for multiple platforms
+
+## Next Steps
+
+- When integrating database migrations, JWT authentication, or other features, update `cmd/api/main.go` and this README with the new commands
+- Keep this README synchronized with changes to the main entrypoint so it accurately reflects what the service runs
+- The project is configured for easy extension with additional features and maintains clean architecture boundaries
+
+## Contributing
+
+1. Read the [Development Guide](DEVELOPMENT.md)
+2. Follow the established project structure
+3. Write tests for new features
+4. Run `make ci` before committing
+5. Ensure all CI checks pass

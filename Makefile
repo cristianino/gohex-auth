@@ -105,3 +105,8 @@ clean: ## Clean build artifacts
 
 # CI targets
 ci: deps fmt vet lint test build ## Run CI pipeline locally
+
+# Documentation targets
+setup-wiki: ## Set up GitHub Wiki documentation
+	@echo "Setting up GitHub Wiki..."
+	@./scripts/setup-wiki.sh
