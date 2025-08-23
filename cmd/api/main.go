@@ -8,6 +8,6 @@ func main() {
 	router := app.SetupRouter()
 
 	if err := router.Run(); err != nil {
-		panic(err)
+		log.Fatalf("failed to start server: %v", err)
 	}
 }
