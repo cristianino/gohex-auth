@@ -57,7 +57,12 @@ lint: ## Run golangci-lint
 fmt: ## Format code
 	@echo "Formatting code..."
 	@go fmt ./...
-	@$(shell go env GOPATH)/bin/gofumpt -w .
+	@$(GOBIN)/golangci-lint run
+
+fmt: ## Format code
+	@echo "Formatting code..."
+	@go fmt ./...
+	@$(GOBIN)/gofumpt -w .
 
 vet: ## Run go vet
 	@echo "Running go vet..."
