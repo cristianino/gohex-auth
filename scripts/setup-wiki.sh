@@ -6,7 +6,8 @@
 set -e
 
 REPO_URL="https://github.com/cristianino/gohex-auth"
-WIKI_URL="https://github.com/cristianino/gohex-auth.wiki"
+REPO_URL="${REPO_URL:-https://github.com/cristianino/gohex-auth}"
+WIKI_URL="${WIKI_URL:-https://github.com/cristianino/gohex-auth.wiki}"
 
 echo "🚀 GoHex Auth - GitHub Wiki Setup"
 echo "=================================="
