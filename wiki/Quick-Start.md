@@ -21,7 +21,7 @@ docker --version
 
 ### 1. Clone and Navigate
 ```bash
-git clone https://github.com/cristianino/gohex-auth.git
+git clone <repository-url>
 cd gohex-auth
 ```
 
