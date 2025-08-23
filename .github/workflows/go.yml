@@ -103,7 +103,7 @@ jobs:
         GOOS=windows GOARCH=amd64 go build -o bin/gohex-auth-windows-amd64.exe ./cmd/api
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: binaries
         path: bin/ 
