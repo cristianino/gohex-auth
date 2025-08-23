@@ -1,287 +1,223 @@
 # Go REST API with Hexagonal Architecture
 
-A clean and scalable REST API built with Go, following Hexagonal Architecture principles (Ports & Adapters). This project includes JWT authentication with bearer tokens, PostgreSQL database integration, and Redis caching.
+This repository contains the scaffolding for a Go REST API organized using Hexagonal Architecture (Ports & Adapters). The project is prepared to support JWT authentication, PostgreSQL, Redis, and migrations, but the current `cmd/api/main.go` in this branch is a minimal implementation that starts an HTTP server with Gin and exposes a simple health endpoint.
 
-## 🏗️ Architecture Overview
+## Quick Start
 
-This project implements **Hexagonal Architecture** (also known as Ports & Adapters), which provides:
+```bash
+# Install dependencies and tools
+make deps
 
-- **Clear separation of concerns**: Business logic isolated from external dependencies
-- **Testability**: Easy to unit test core business logic
-- **Flexibility**: Easy to swap implementations (databases, web frameworks, etc.)
-- **Maintainability**: Well-organized code structure
+# Run development checks
+make ci
 
-## 📁 Project Structure
+# Start the application
+make run
+
+# Or start with live reload
+make dev-run
+```
+
+## Current State
+
+- The application entrypoint is `cmd/api/main.go`.
+- At the moment the server exposes only a health endpoint:
+  - GET /ping -> { "message": "pong" }
+- Features referenced elsewhere in the repository (migrations, JWT, protected endpoints, Swagger docs, etc.) are not wired up by the `main.go` in this branch and should be implemented or connected before relying on them.
+
+## Project Structure
 
 ```
 project/
 ├── cmd/                          # Application entry points
 │   └── api/
-│       └── main.go              # Main application bootstrap
-├── internal/                    # Private application code
-│   ├── core/                    # Business logic layer (Domain)
-│   │   ├── domain/              # Core business entities and logic
-│   │   │   ├── entities/        # Domain entities (User, Auth, etc.)
-│   │   │   ├── repositories/    # Repository interfaces
-│   │   │   └── services/        # Business logic services
-│   │   └── ports/               # Interfaces for inbound/outbound communication
-│   │       ├── input/           # Inbound ports (use cases)
-│   │       └── output/          # Outbound ports (repositories, external services)
-│   ├── adapters/                # External layer implementations
-│   │   ├── input/               # Inbound adapters
-│   │   │   └── http/            # HTTP REST API implementation
-│   │   │       ├── handlers/    # HTTP request handlers
-│   │   │       ├── middleware/  # HTTP middleware (auth, CORS, etc.)
-│   │   │       ├── routes/      # Route definitions
-│   │   │       └── dto/         # Data Transfer Objects
-│   │   └── output/              # Outbound adapters
-│   │       ├── persistence/     # Database implementations
-│   │       │   ├── postgres/    # PostgreSQL implementations
-│   │       │   └── migrations/  # Database migration files
-│   │       └── external/        # External service clients
-│   └── config/                  # Configuration management
-├── pkg/                         # Public packages (can be imported by external projects)
-│   ├── utils/                   # Utility functions
-│   └── errors/                  # Custom error types
-├── docs/                        # Documentation
-├── tests/                       # Test suites
-│   ├── unit/                    # Unit tests
-│   ├── integration/             # Integration tests
-│   └── e2e/                     # End-to-end tests
-├── docker/                      # Docker configuration
-│   ├── Dockerfile              # Application container
-│   └── docker-compose.yml      # Multi-service setup
-└── scripts/                     # Build and deployment scripts
+│       └── main.go               # Main application bootstrap
+├── internal/                      # Private application code
+│   ├── app/                       # Application setup and configuration
+│   ├── core/                      # Business logic layer (Domain)
+│   │   ├── domain/                # Core business entities and logic
+│   │   │   ├── entities/          # Domain entities (User, Auth, etc.)
+│   │   │   ├── repositories/      # Repository interfaces
+│   │   │   └── services/          # Business logic services
+│   │   └── ports/                 # Interfaces for inbound/outbound communication
+│   │       ├── input/             # Inbound ports (use cases)
+│   │       └── output/            # Outbound ports (repositories, external services)
+│   ├── adapters/                  # External implementations
+│   │   ├── input/                 # Inbound adapters
+│   │   │   └── http/              # HTTP REST API implementation
+│   │   │       ├── handlers/
+│   │   │       ├── middleware/
+│   │   │       ├── routes/
+│   │   │       └── dto/
+│   │   └── output/                # Outbound adapters
+│   │       ├── persistence/       # Database implementations
+│   │       │   ├── postgres/
+│   │       │   └── migrations/
+│   │       └── external/          # External service clients
+│   └── config/                    # Configuration management
+├── pkg/                           # Public packages (reusable)
+│   ├── utils/
+│   └── errors/
+├── tests/                         # Test suites organized by type
+│   ├── unit/                      # Unit tests
+│   ├── integration/               # Integration tests
+│   ├── e2e/                       # End-to-end tests
+│   └── README.md                  # Testing documentation
+├── .github/workflows/             # CI/CD pipelines
+├── Dockerfile
+├── Dockerfile.dev
+├── docker-compose.yml
+├── Makefile                       # Build automation
+├── DEVELOPMENT.md                 # Development guide
+└── README.md
 ```
 
-### 🎯 Directory Purpose
+## Documentation
 
-- **`cmd/`**: Contains the main applications for this project. The directory name matches the application executable name.
-- **`internal/`**: Private application and library code. This is enforced by the Go compiler.
-- **`internal/core/`**: The heart of your application containing business logic, independent of external concerns.
-- **`internal/adapters/`**: Implementations that adapt external concerns (HTTP, databases) to your core business logic.
-- **`pkg/`**: Library code that's ok to use by external applications.
-- **`tests/`**: Additional external test apps and test data.
+- **[Development Guide](DEVELOPMENT.md)** - Comprehensive development setup and workflow
+- **[GitHub Wiki](https://github.com/cristianino/gohex-auth/wiki)** - Detailed project documentation and architecture guides
+- **[Tools Configuration](docs/TOOLS.md)** - Development tools setup and configuration
+- **[Testing Guide](tests/README.md)** - Testing strategy and organization
 
-## 🚀 Getting Started
+### Wiki Setup
 
-### Prerequisites
+To set up the GitHub Wiki with comprehensive documentation:
 
-- **Go 1.21+**
-- **Docker & Docker Compose** (for containerized setup)
-- **PostgreSQL 15+** (if running locally)
-- **Redis 7+** (if running locally)
-
-### 🔧 Environment Setup
-
-1. **Clone the repository**:
 ```bash
-git clone <repository-url>
-cd <project-name>
+./scripts/setup-wiki.sh
 ```
 
-2. **Copy environment file**:
+## Requirements
+
+- Go 1.23+ (installed and in PATH)
+- Make (build automation)
+- Docker & Docker Compose (optional — only required if you want to run Postgres/Redis via containers)
+
+## Development
+
+For detailed development instructions, see [DEVELOPMENT.md](DEVELOPMENT.md) or browse our comprehensive [GitHub Wiki](../../wiki).
+
+### Documentation
+- **[GitHub Wiki](../../wiki)** - Comprehensive documentation and guides
+- **[Quick Start Guide](../../wiki/Quick-Start)** - Get running in 5 minutes
+- **[Development Workflow](../../wiki/Development-Workflow)** - Daily development practices
+- **[Architecture Guide](../../wiki/Hexagonal-Architecture)** - System design and patterns
+
+### Quick Development Commands
+
 ```bash
-cp .env.example .env
+# Show all available commands
+make help
+
+# Install dependencies and run quality checks
+make ci
+
+# Run the application
+make run
+
+# Run with live reload for development
+make dev-run
+
+# Run tests
+make test                # All tests
+make test-unit          # Unit tests only
+make test-integration   # Integration tests only
+
+# Code quality
+make fmt               # Format code
+make lint              # Run linter
+make vet               # Static analysis
 ```
 
-3. **Configure your `.env` file**:
-```env
-# Application
-APP_NAME=hexagonal-api
-APP_ENV=development
-APP_PORT=8080
-APP_DEBUG=true
+## API Endpoints
 
-# Database
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=postgres
-DB_NAME=hexagonal_db
-DB_SSL_MODE=disable
+### Health Check
 
-# Redis
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_PASSWORD=
-REDIS_DB=0
-
-# JWT
-JWT_SECRET=your-super-secret-key-here
-JWT_EXPIRY_HOURS=24
-
-# CORS
-CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8080
+```bash
+curl http://localhost:8080/ping
+# Response: {"message":"pong"}
 ```
 
-### 🐳 Running with Docker Compose (Recommended)
+## Docker Usage
 
-This is the easiest way to get started with all dependencies:
+### Development with Live Reload
+
+```bash
+# Start development environment with live reload
+make docker-dev
+
+# Or build and start (if you made changes to Dockerfile.dev)
+make docker-dev-build
+
+# View logs
+make docker-logs
+
+# Stop services
+make docker-stop
+```
+
+### Production Build
+
+```bash
+make docker-build
+make docker-run
+```
+
+### Docker Compose Services
 
 ```bash
 # Start all services (API, PostgreSQL, Redis)
-docker-compose up -d
+docker-compose up
 
-# View logs
-docker-compose logs -f api
+# Start only development API with live reload
+docker-compose up api-dev
 
-# Stop all services
-docker-compose down
-
-# Rebuild and start (after code changes)
-docker-compose up --build -d
+# Start in background
+docker-compose up -d api-dev
 ```
 
-**Services will be available at:**
-- **API**: http://localhost:8080
-- **PostgreSQL**: localhost:5432
-- **Redis**: localhost:6379
+## Testing
 
-### 🔨 Running with Go (Development)
+The project includes comprehensive testing at multiple levels:
 
-1. **Install dependencies**:
+- **Unit Tests**: Test individual components in isolation
+- **Integration Tests**: Test component interactions using httptest
+- **End-to-End Tests**: Test complete workflows (may be skipped in CI environments)
+
 ```bash
-go mod tidy
+# Run all tests
+make test
+
+# Run with coverage reports
+make test-coverage
+
+# Run specific test types
+make test-unit
+make test-integration
+make test-e2e
 ```
 
-2. **Start PostgreSQL and Redis** (using Docker):
-```bash
-# Start only databases
-docker-compose up -d postgres redis
-```
+See [tests/README.md](tests/README.md) for detailed testing documentation.
 
-3. **Run database migrations**:
-```bash
-go run cmd/api/main.go migrate
-```
+## Continuous Integration
 
-4. **Start the application**:
-```bash
-# Development mode with hot reload (install air first)
-go install github.com/cosmtrek/air@latest
-air
+The project uses GitHub Actions for CI/CD:
+- Runs on push/PR to `develop` and `main` branches  
+- Tests against multiple Go versions (1.23, 1.24, 1.25)
+- Performs code quality checks (vet, staticcheck, golangci-lint)
+- Generates coverage reports
+- Builds binaries for multiple platforms
 
-# Or run directly
-go run cmd/api/main.go serve
-```
+## Next Steps
 
-### 📊 Database Management
+- When integrating database migrations, JWT authentication, or other features, update `cmd/api/main.go` and this README with the new commands
+- Keep this README synchronized with changes to the main entrypoint so it accurately reflects what the service runs
+- The project is configured for easy extension with additional features and maintains clean architecture boundaries
 
-**Run migrations**:
-```bash
-# Using Go
-go run cmd/api/main.go migrate
+## Contributing
 
-# Using Docker
-docker-compose exec api go run cmd/api/main.go migrate
-```
-
-**Reset database**:
-```bash
-# Using Docker Compose
-docker-compose down -v
-docker-compose up -d
-```
-
-## 🔑 API Authentication
-
-This API uses **JWT Bearer Token** authentication:
-
-1. **Register/Login** to get a JWT token
-2. **Include the token** in subsequent requests:
-```bash
-Authorization: Bearer <your-jwt-token>
-```
-
-### Example API Calls
-
-**Register a new user**:
-```bash
-curl -X POST http://localhost:8080/api/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "password123",
-    "name": "John Doe"
-  }'
-```
-
-**Login**:
-```bash
-curl -X POST http://localhost:8080/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "password123"
-  }'
-```
-
-**Access protected endpoint**:
-```bash
-curl -X GET http://localhost:8080/api/v1/users/profile \
-  -H "Authorization: Bearer <your-jwt-token>"
-```
-
-## 🧪 Testing
-
-**Run all tests**:
-```bash
-go test ./...
-```
-
-**Run tests with coverage**:
-```bash
-go test -v -cover ./...
-```
-
-**Run specific test suite**:
-```bash
-# Unit tests only
-go test ./tests/unit/...
-
-# Integration tests only
-go test ./tests/integration/...
-```
-
-## 🛠️ Development Tools
-
-**Recommended tools for development**:
-
-- **Air** - Hot reload for Go applications
-  ```bash
-  go install github.com/cosmtrek/air@latest
-  ```
-
-- **golang-migrate** - Database migration tool
-  ```bash
-  go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
-  ```
-
-## 📝 API Documentation
-
-Once the application is running, you can access:
-
-- **Health Check**: http://localhost:8080/health
-- **API Documentation**: http://localhost:8080/docs (if Swagger is implemented)
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🔗 Technologies Used
-
-- **[Gin](https://github.com/gin-gonic/gin)** - HTTP web framework
-- **[PostgreSQL](https://www.postgresql.org/)** - Primary database
-- **[Redis](https://redis.io/)** - Caching and sessions
-- **[JWT](https://github.com/golang-jwt/jwt)** - Authentication tokens
-- **[Docker](https://www.docker.com/)** - Containerization
-- **[Air](https://github.com/cosmtrek/air)** - Hot reload for development
+1. Read the [Development Guide](DEVELOPMENT.md)
+2. Follow the established project structure
+3. Write tests for new features
+4. Run `make ci` before committing
+5. Ensure all CI checks pass

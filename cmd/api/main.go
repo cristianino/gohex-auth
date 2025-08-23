@@ -1,19 +1,15 @@
 package main
 
 import (
-	"net/http"
+	"log"
 
-	"github.com/gin-gonic/gin"
+	"github.com/cristianino/gohex-auth/internal/app"
 )
 
 func main() {
-	router := gin.Default()
+	router := app.SetupRouter()
 
-	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
-
-	router.Run()
+	if err := router.Run(); err != nil {
+		log.Fatalf("failed to start server: %v", err)
+	}
 }

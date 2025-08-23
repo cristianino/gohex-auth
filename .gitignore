@@ -1,1 +1,49 @@
+# Environment files
 .env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Build artifacts
+/bin/
+/tmp/
+*.out
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+main
+
+# Air live reload logs
+build-errors.log
+
+# Coverage reports
+coverage-*.html
+*.coverprofile
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+build-errors.log
+
+# Dependencies
+/vendor/
+go.work
+go.work.sum

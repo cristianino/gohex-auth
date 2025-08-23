@@ -5,24 +5,105 @@ name: Go
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "develop", "main" ]
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "develop", "main" ]
 
 jobs:
 
-  build:
+  test:
     runs-on: ubuntu-latest
+    
     steps:
     - uses: actions/checkout@v4
 
     - name: Set up Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
-        go-version: '1.25'
+        go-version: '1.25.x'
+
+    - name: Cache Go modules
+      uses: actions/cache@v3
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Download dependencies
+      run: go mod download
+
+    - name: Verify dependencies
+      run: go mod verify
+
+    - name: Run go vet
+      run: go vet ./...
+
+    - name: Install staticcheck
+      run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+    - name: Run staticcheck
+      run: staticcheck ./...
+
+    - name: Install golangci-lint
+      run: |
+        curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin latest
+
+    - name: Run golangci-lint
+      run: golangci-lint run
 
     - name: Build
       run: go build -v ./...
 
-    - name: Test
-      run: go test -v ./...
+    - name: Run unit tests
+      run: go test ./tests/unit -v -race -coverprofile=unit.out
+
+    - name: Run integration tests
+      run: go test ./tests/integration -v -race -coverprofile=integration.out
+
+    - name: Run e2e tests
+      run: go test ./tests/e2e -v -race -coverprofile=e2e.out
+
+    - name: Merge coverage reports
+      run: |
+        go install github.com/wadey/gocovmerge@latest
+        gocovmerge unit.out integration.out e2e.out > coverage.out
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.out
+        flags: unittests
+        name: codecov-umbrella
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.25.x'
+
+    - name: Cache Go modules
+      uses: actions/cache@v3
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Build for multiple platforms
+      run: |
+        GOOS=linux GOARCH=amd64 go build -o bin/gohex-auth-linux-amd64 ./cmd/api
+        GOOS=darwin GOARCH=amd64 go build -o bin/gohex-auth-darwin-amd64 ./cmd/api
+        GOOS=windows GOARCH=amd64 go build -o bin/gohex-auth-windows-amd64.exe ./cmd/api
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: binaries
+        path: bin/ 
