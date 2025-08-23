@@ -58,10 +58,6 @@ fmt: ## Format code
 	@echo "Formatting code..."
 	@go fmt ./...
 	@$(GOBIN)/golangci-lint run
-
-fmt: ## Format code
-	@echo "Formatting code..."
-	@go fmt ./...
 	@$(GOBIN)/gofumpt -w .
 
 vet: ## Run go vet
